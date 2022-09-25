@@ -1215,9 +1215,10 @@ The available fields are:
  - `view_count` (numeric): How many users have watched the video on the platform
  - `like_count` (numeric): Number of positive ratings of the video
  - `dislike_count` (numeric): Number of negative ratings of the video
- - `repost_count` (numeric): Number of reposts of the video
+ - `repost_count` (numeric): Number of reposts (or shares) of the video
  - `average_rating` (numeric): Average rating give by users, the scale used depends on the webpage
  - `comment_count` (numeric): Number of comments on the video (For some extractors, comments are only downloaded at the end, and so this field cannot be used)
+ - `download_count` (numeric): Number of times the video has been downloaded (by the built in downloader, not via YT-DLP)
  - `age_limit` (numeric): Age restriction for the video (years)
  - `live_status` (string): One of "not_live", "is_live", "is_upcoming", "was_live", "post_live" (was live, but VOD is not yet processed)
  - `is_live` (boolean): Whether this video is a live stream or a fixed-length video
@@ -1263,7 +1264,7 @@ Available for the video that is an episode of some series or programme:
  - `episode_number` (numeric): Number of the video episode within a season
  - `episode_id` (string): Id of the video episode
 
-Available for the media that is a track or a part of a music album:
+Available for the media that is a track, a part of a music album, or a short-form video with a music track:
 
  - `track` (string): Title of the track
  - `track_number` (numeric): Number of the track within an album or a disc
