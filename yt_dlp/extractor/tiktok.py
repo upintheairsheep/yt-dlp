@@ -915,4 +915,4 @@ class TikTokVMIE(InfoExtractor):
             HEADRequest(url), self._match_id(url), headers={'User-Agent': 'facebookexternalhit/1.1'}).geturl()
         if self.suitable(new_url):  # Prevent infinite loop in case redirect fails
             raise UnsupportedError(new_url)
-        return self.url_result(new_url)
+        return self.url_result(new_url) 
