@@ -144,7 +144,7 @@ class TikTokBaseIE(InfoExtractor):
             if not caption_json:
                 continue
             subtitles.setdefault(caption.get('language', 'en'), []).append({
-                'ext': 'srt',
+                'ext': 'tiktokcaptions.json',
                 'data': '\n\n'.join(
                     f'{i + 1}\n{srt_subtitles_timecode(line["start_time"] / 1000)} --> {srt_subtitles_timecode(line["end_time"] / 1000)}\n{line["text"]}'
                     for i, line in enumerate(caption_json['utterances']) if line.get('text'))
