@@ -347,6 +347,67 @@ class TikTokBaseIE(InfoExtractor):
                     'width': width,
                     'height': height
                 }]
+        def _get_comments(self, video_id):
+            comments_info = self._download_json(
+            def get_comments(video_id):
+            headers = {
+                    "Accept-Encoding": "gzip, deflate, sdch",
+                    "Accept-Language": "en-US,en;q=0.8",
+                    "Upgrade-Insecure-Requests": "1",
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "Cache-Control": "max-age=0",
+                    "Connection": "keep-alive",
+                    }
+            headers["referer"] = f"https://www.tiktok.com/embed/{video_id}"
+            cursor = 0
+            comments = []
+            r_session = requests.Session()
+
+            while True:
+                try:
+                    params = {
+                        "aweme_id": str(video_id),
+                        "count": "50",  # Maximum allowed by TikTok
+                        "cursor": str(cursor),
+                      }
+                response = r_session.get(
+                "https://www.tiktok.com/api/comment/list/",
+                headers=headers,
+                params=params,
+                timeout=5,
+            )
+            
+            data = response.json()
+
+            comments.extend(data["comments"])
+
+            old_cursor = cursor
+            cursor = cursor + len(data["comments"])
+
+            print(f"{video_id=}: Got {old_cursor} to {cursor} comments")
+
+            if data["has_more"] != 1:
+                break
+
+            time.sleep(0.5)
+        except:
+            print(traceback.format_exc())
+            return comments, cursor
+
+    return comments, cursor
+
+        comment_data = traverse_obj(comments_info, ('edge_media_to_parent_comment', 'edges'), 'comments')
+        for comment_dict in comment_data or []:
+            yield {
+                'author': traverse_obj(comment_dict, ('node', 'owner', 'username'), ('user', 'username')),
+                'author_id': traverse_obj(comment_dict, ('node', 'owner', 'id'), ('user', 'pk')),
+                'author_thumbnail': traverse_obj(comment_dict, ('node', 'owner', 'profile_pic_url'), ('user', 'profile_pic_url'), expected_type=url_or_none),
+                'id': traverse_obj(comment_dict, ('node', 'id'), 'pk'),
+                'text': traverse_obj(comment_dict, ('node', 'text'), 'text'),
+                'like_count': traverse_obj(comment_dict, ('node', 'edge_liked_by', 'count'), 'comment_like_count', expected_type=int_or_none),
+                'timestamp': traverse_obj(comment_dict, ('node', 'created_at'), 'created_at', expected_type=int_or_none),
+            }
 
         return {
             'id': traverse_obj(aweme_detail, 'id', 'awemeId', expected_type=str_or_none),
