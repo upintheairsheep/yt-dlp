@@ -338,6 +338,13 @@ class TikTokBaseIE(InfoExtractor):
             })
         self._remove_duplicate_formats(formats)
         self._sort_formats(formats)
+        
+        tags = []
+        for item in (try_get(status, lambda x: x['aweme_detail']['text_extra'], list) or []):
+            hashtag_name = hashtag.get('text')
+            if not hashtag_name:
+                continue
+            tags.append(hashtag_name)
 
         thumbnails = []
         for thumbnail_name in ('thumbnail', 'cover', 'dynamicCover', 'originCover'):
