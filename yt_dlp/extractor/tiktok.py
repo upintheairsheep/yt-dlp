@@ -918,7 +918,7 @@ class TikTokLiveIE(InfoExtractor):
     IE_NAME = 'tiktok:live'
 
     def _real_extract(self, url):
-        # TODO: add support for TikTok Live Chat
+        # TODO: add support for TikTok Live events, see https://github.com/isaackogan/TikTokLive for reference
         uploader = self._match_id(url)
         webpage = self._download_webpage(url, uploader, headers={'User-Agent': 'User-Agent:Mozilla/5.0'})
         room_id = self._html_search_regex(r'snssdk\d*://live\?room_id=(\d+)', webpage, 'room ID', default=None)
