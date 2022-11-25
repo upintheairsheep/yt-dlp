@@ -918,6 +918,7 @@ class TikTokLiveIE(InfoExtractor):
     IE_NAME = 'tiktok:live'
 
     def _real_extract(self, url):
+        # TODO: add support for TikTok Live Chat
         uploader = self._match_id(url)
         webpage = self._download_webpage(url, uploader, headers={'User-Agent': 'User-Agent:Mozilla/5.0'})
         room_id = self._html_search_regex(r'snssdk\d*://live\?room_id=(\d+)', webpage, 'room ID', default=None)
@@ -929,6 +930,7 @@ class TikTokLiveIE(InfoExtractor):
                  or self._html_search_meta(['og:title', 'twitter:title'], webpage, default=''))
         # thumbnail = traverse_obj(video_js_data, ('LiveRoomInfo', 'coverUrl'))
         # status = 2 if live else 4
+        concurrent_view_count = (traverse_obj(video_js_data, ('LiveRoomInfo', 'liveRoomStats', 'userCount'), expected_type=int)
         is_live = traverse_obj(video_js_data, ('LiveRoomInfo', 'status'), expected_type=int, default=4) == 2
         if not is_live:
             raise ExtractorError('The user is not currently live', expected=True)
@@ -936,6 +938,7 @@ class TikTokLiveIE(InfoExtractor):
         if not live_url:
             raise ExtractorError('No stream URL found')
         formats = self._extract_m3u8_formats(live_url, room_id, 'mp4', live=is_live)
+                                 
         return {
             'id': room_id,
             'title': title,
