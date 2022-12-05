@@ -171,7 +171,14 @@ class GoogleDriveIE(InfoExtractor):
         reason = get_value('reason')
         title = get_value('title')
         if not title and reason:
-            raise ExtractorError(reason, expected=True)
+            # try old style title extraction
+            webpage = self._download_webpage(
+                'http://docs.google.com/file/d/%s' % video_id, video_id)
+            title = self._search_regex(
+                r'"title"\s*,\s*"([^"]+)', webpage, 'title',
+                default=None) or self._og_search_title(webpage)
+            if not title:
+                raise ExtractorError(reason, expected=True)
 
         formats = []
         fmt_stream_map = (get_value('fmt_stream_map') or '').split(',')
