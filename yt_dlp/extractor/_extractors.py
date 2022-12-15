@@ -249,6 +249,7 @@ from .brightcove import (
 from .businessinsider import BusinessInsiderIE
 from .bundesliga import BundesligaIE
 from .buzzfeed import BuzzFeedIE
+from .buzzvideo import BuzzVideoIE
 from .byutv import BYUtvIE
 from .c56 import C56IE
 from .cableav import CableAVIE
@@ -933,6 +934,10 @@ from .lnkgo import (
     LnkIE,
 )
 from .localnews8 import LocalNews8IE
+from .loom import (
+    LoomIE
+    LoomFolderIE
+)
 from .lovehomeporn import LoveHomePornIE
 from .lrt import (
     LRTVODIE,
@@ -1137,6 +1142,7 @@ from .nebula import (
     NebulaChannelIE,
 )
 from .nerdcubed import NerdCubedFeedIE
+from .nest import NestIE
 from .netzkino import NetzkinoIE
 from .neteasemusic import (
     NetEaseMusicIE,
@@ -1521,6 +1527,7 @@ from .reuters import ReutersIE
 from .reverbnation import ReverbNationIE
 from .rice import RICEIE
 from .rmcdecouverte import RMCDecouverteIE
+from .roblox import RobloxIE
 from .rockstargames import RockstarGamesIE
 from .rokfin import (
     RokfinIE,
