@@ -935,8 +935,8 @@ from .lnkgo import (
 )
 from .localnews8 import LocalNews8IE
 from .loom import (
-    LoomIE
-    LoomFolderIE
+    LoomIE,
+    LoomFolderIE,
 )
 from .lovehomeporn import LoveHomePornIE
 from .lrt import (
