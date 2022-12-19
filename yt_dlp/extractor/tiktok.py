@@ -1067,3 +1067,42 @@ class TikTokVMIE(InfoExtractor):
         if self.suitable(new_url):  # Prevent infinite loop in case redirect fails
             raise UnsupportedError(new_url)
         return self.url_result(new_url)
+class TikTokLiveIE(InfoExtractor):
+    _VALID_URL = r'https?://(?:www\.)?tiktok\.com/@(?P<id>[\w\.-]+)/live'
+    IE_NAME = 'tiktok:live'
+
+    _TESTS = [{
+        'url': 'https://www.tiktok.com/@iris04201/live',
+        'only_matching': True,
+    }]
+
+    def _real_extract(self, url):
+        uploader = self._match_id(url)
+        webpage = self._download_webpage(url, uploader, headers={'User-Agent': 'User-Agent:Mozilla/5.0'})
+        room_id = self._html_search_regex(r'snssdk\d*://live\?room_id=(\d+)', webpage, 'room ID', default=None)
+        if not room_id:
+            raise ExtractorError('The user is not currently live', expected=True)
+        video_js_data = self._download_json(
+            'https://www.tiktok.com/api/live/detail/', room_id, query={
+                'aid': '1988',
+                'roomID': room_id,
+            })
+        # status = 2 if live else 4
+        is_live = traverse_obj(video_js_data, ('LiveRoomInfo', 'status'), expected_type=int, default=4) == 2
+        if not is_live:
+            raise ExtractorError('The user is not currently live', expected=True)
+        live_url = traverse_obj(video_js_data, ('LiveRoomInfo', 'liveUrl'), expected_type=url_or_none)
+        if not live_url:
+            raise ExtractorError('No stream URL found')
+
+        return {
+            'id': room_id,
+            'title': (traverse_obj(video_js_data, ('LiveRoomInfo', 'title'), expected_type=str)
+                      or self._html_search_meta(['og:title', 'twitter:title'], webpage, default='')),
+            'uploader': traverse_obj(video_js_data, ('LiveRoomInfo', 'ownerInfo', 'uniqueId')) or uploader,
+            'uploader_id': traverse_obj(video_js_data, ('LiveRoomInfo', 'ownerInfo', 'id')),
+            'creator': traverse_obj(video_js_data, ('LiveRoomInfo', 'ownerInfo', 'nickname')),
+            'concurrent_view_count': traverse_obj(video_js_data, ('LiveRoomInfo', 'liveRoomStats', 'userCount'), expected_type=int),
+            'formats': self._extract_m3u8_formats(live_url, room_id, 'mp4', live=is_live),
+            'is_live': is_live,
+        }
