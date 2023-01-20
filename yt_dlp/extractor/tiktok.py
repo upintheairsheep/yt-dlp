@@ -1111,40 +1111,4 @@ class TikTokLiveIE(InfoExtractor):
             'is_live': is_live,
         }
 
-    class TikTokLiveIE(InfoExtractor):
-    _VALID_URL = r'https?://(?:www\.)?tiktok\.com/@(?P<id>[\w\.-]+)/live'
-    IE_NAME = 'tiktok:live'
-
-    _TESTS = [{
-        'url': 'https://www.tiktok.com/@iris04201/live',
-        'only_matching': True,
-    }]
-
-    def _real_extract(self, url):
-        uploader = self._match_id(url)
-        webpage = self._download_webpage(url, uploader, headers={'User-Agent': 'User-Agent:Mozilla/5.0'})
-        room_id = self._html_search_regex(r'snssdk\d*://live\?room_id=(\d+)', webpage, 'room ID', default=None)
-        if not room_id:
-            raise UserNotLive(video_id=uploader)
-        live_info = traverse_obj(self._download_json(
-            'https://www.tiktok.com/api/live/detail/', room_id, query={
-                'aid': '1988',
-                'roomID': room_id,
-            }), 'LiveRoomInfo', expected_type=dict, default={})
-
-        if 'status' not in live_info:
-            raise ExtractorError('Unexpected response from TikTok API')
-        # status = 2 if live else 4
-        if not int_or_none(live_info['status']) == 2:
-            raise UserNotLive(video_id=uploader)
-
-        return {
-            'id': room_id,
-            'title': live_info.get('title') or self._html_search_meta(['og:title', 'twitter:title'], webpage, default=''),
-            'uploader': uploader,
-            'uploader_id': traverse_obj(live_info, ('ownerInfo', 'id')),
-            'creator': traverse_obj(live_info, ('ownerInfo', 'nickname')),
-            'concurrent_view_count': traverse_obj(live_info, ('liveRoomStats', 'userCount'), expected_type=int),
-            'formats': self._extract_m3u8_formats(live_info['liveUrl'], room_id, 'mp4', live=True),
-            'is_live': True,
-        }
+    
