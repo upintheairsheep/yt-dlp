@@ -561,11 +561,11 @@ class TikTokIE(TikTokBaseIE):
         'only_matching': True
     }]
         def get_replies_of_tiktok_comment(self, aweme_id, comment_id):
-            reply_json = self._download_json(
-                f'https://api-h2.tiktokv.com/aweme/v1/comment/list/reply/?comment_id={comment_id}&item_id={aweme_id}&cursor=0&count=20&insert_ids=&top_ids=&channel_id=0', 
-                data=b'', fatal=False, note='Checking if comment has any replies...') or {} 
-            has_more = traverse_obj(reply_json, ('has_more'))
-            commentsnum = len(reply_json['comments'])
+        reply_json = self._download_json(
+            f'https://api-h2.tiktokv.com/aweme/v1/comment/list/reply/?comment_id={comment_id}&item_id={aweme_id}&cursor=0&count=20&insert_ids=&top_ids=&channel_id=0', 
+            data=b'', fatal=False, note='Checking if comment has any replies...') or {} 
+        has_more = traverse_obj(reply_json, ('has_more'))
+        commentsnum = len(reply_json['comments'])
 
             for i in range(has_more) and commentsnum != 0:
                 if i == 0:
