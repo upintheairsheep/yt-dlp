@@ -1,19 +1,15 @@
 import re
 
 from .common import InfoExtractor
-from ..compat import (
-    compat_parse_qs,
-    compat_str,
-)
+from ..compat import compat_parse_qs
 from ..utils import (
     determine_ext,
     ExtractorError,
     get_element_by_class,
     int_or_none,
     lowercase_escape,
-    strip_or_none,
+    try_get,
     update_url_query,
-    unified_strdate,
 )
 
 
@@ -30,7 +26,6 @@ class GoogleDriveIE(InfoExtractor):
                             )
                             (?P<id>[a-zA-Z0-9_-]{28,})
                     '''
-    _API_KEY = 'AIzaSyCGrlNJSIw19pjonNQOqMIyS2Xai9g0YT0'
     _TESTS = [{
         'url': 'https://drive.google.com/file/d/0ByeS4oOUV-49Zzh4R1J6R09zazQ/edit?pli=1',
         'md5': '5c602afbbf2c1db91831f5d82f678554',
@@ -163,26 +158,12 @@ class GoogleDriveIE(InfoExtractor):
             return
         return self._get_captions_by_type(
             video_id, subtitles_id, 'automatic_captions', origin_lang_code)
-    
-    def _call_api(self, video_id):
-        # Call Google Drive API
-        json_data = self._download_json(
-            'https://www.googleapis.com/drive/v3/files/%s?fields=createdTime,modifiedTime,owners&key=%s' % (video_id, self._API_KEY),
-            video_id, fatal=False) or {}
-         return json_data
-
-    # USING URL: https://drive.google.com/file/d/1lVFQrzYKnJDd045Gc9xv1W4YA9zKPX7r/view?usp=sharing
-    # API KEY: AIzaSyCGrlNJSIw19pjonNQOqMIyS2Xai9g0YT0
 
     def _real_extract(self, url):
         video_id = self._match_id(url)
         video_info = compat_parse_qs(self._download_webpage(
             'https://drive.google.com/get_video_info',
             video_id, query={'docid': video_id}))
-        json_data = self._call_api(video_id)
-        createdTime = unified_strdate(json_data.get('createdTime'))
-        modifiedTime = unified_strdate(json_data.get('modifiedTime'))
-        owner_lst = traverse_obj(json_data, ('owners', Ellipsis, 'displayName'), expected_type=strip_or_none)
 
         def get_value(key):
             return try_get(video_info, lambda x: x[key][0])
@@ -299,9 +280,6 @@ class GoogleDriveIE(InfoExtractor):
             'subtitles': self.extract_subtitles(video_id, subtitles_id, hl),
             'automatic_captions': self.extract_automatic_captions(
                 video_id, subtitles_id, hl),
-            'created_date': createdTime,
-            'modified_date': modifiedTime,
-            'uploader': join(owner_lst or [])
         }
 
 
@@ -321,9 +299,7 @@ class GoogleDriveFolderIE(InfoExtractor):
     _DATA = f'''--{_BOUNDARY}
 content-type: application/http
 content-transfer-encoding: binary
-
 GET %s
-
 --{_BOUNDARY}
 '''
 
