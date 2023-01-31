@@ -169,7 +169,7 @@ class GoogleDriveIE(InfoExtractor):
         json_data = self._download_json(
             'https://www.googleapis.com/drive/v3/files/%s?fields=createdTime,modifiedTime,owners&key=%s' % (video_id, self._API_KEY),
             video_id, fatal=False) or {}
-            return json_data
+         return json_data
 
     # USING URL: https://drive.google.com/file/d/1lVFQrzYKnJDd045Gc9xv1W4YA9zKPX7r/view?usp=sharing
     # API KEY: AIzaSyCGrlNJSIw19pjonNQOqMIyS2Xai9g0YT0
