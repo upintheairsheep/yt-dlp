@@ -47,7 +47,7 @@ class RobloxIE(InfoExtractor):
         item_container_attrs = extract_attributes(item_container_div[:item_container_div.find('>')+1])
         asset_type = item_container_attrs.get('data-asset-type')
         if asset_type and (asset_type not in ('Audio', 'Video')):
-            raise ExtractorError('This asset is not an audio/video', expected=True)
+            print('This asset is not an audio/video')
         asset_uploader_id, asset_uploader_name = self._search_regex(
             r'>By <a.+href=["\']https?://(?:www\.)?roblox\.com/users/(?P<id>\d+)[^"\']*["\'][^>]*>@?(?P<name>\w+)</a',
             webpage, 'asset creator', fatal=False, group=('id', 'name'))
